@@ -1,0 +1,18 @@
+name: example
+version: 1.0.0
+description: Example for cinema rendering
+
+publish_to: none
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  cinema:
+    path: ../
+  ffmpeg_cli:
+    path: ../../ffmpeg_cli
+
+dev_dependencies:
+  test: ^1.17.12
+  flutter_lints: ^1.0.4

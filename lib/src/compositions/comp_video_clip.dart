@@ -1,0 +1,183 @@
+import 'package:collection/collection.dart' show IterableExtension;
+import 'package:cutting_room/src/timing.dart';
+import 'package:ffmpeg_cli/ffmpeg_cli.dart';
+
+import 'compositions.dart';
+
+/// A clip from a larger video, which spans from `start` to `end`.
+class VideoClipComposition implements Composition {
+  VideoClipComposition({
+    String? videoPath,
+    List<TimeSpan>? spans,
+  })  : assert(videoPath != null && videoPath.isNotEmpty),
+        assert(spans != null && spans.isNotEmpty),
+        _videoPath = videoPath,
+        _spans = spans {
+    // Ensure that all spans before the final span include an
+    // explicit end time.
+    for (int i = 0; i < _spans!.length - 1; ++i) {
+      if (_spans![i].end == null) {
+        throw Exception('A span is missing an end time. Only the final span can omit the end time. Span: '
+            '${_spans![i]}');
+      }
+    }
+  }
+
+  final String? _videoPath;
+  final List<TimeSpan>? _spans;
+
+  @override
+  Future<bool> hasVideo() async {
+    final videoDetails = await Ffprobe.run(_videoPath!);
+    return videoDetails.streams!.firstWhereOrNull((element) => (element.codecType ?? '') == 'video') != null;
+  }
+
+  @override
+  Future<bool> hasAudio() async {
+    final videoDetails = await Ffprobe.run(_videoPath!);
+    return videoDetails.streams!.firstWhereOrNull((element) => (element.codecType ?? '') == 'audio') != null;
+  }
+
+  @override
+  Future<Duration> computeIntrinsicDuration() async {
+    Duration videoDuration = Duration.zero;
+    if (_spans!.last.end == null) {
+      final videoDetails = await Ffprobe.run(_videoPath!);
+      videoDuration = videoDetails.format!.duration!;
+    }
+
+    Duration accumulation = Duration.zero;
+    for (final span in _spans!) {
+      // Note: the constructor includes a check to ensure that no spans
+      //       before the final span have a null end time. If the end
+      //       value is null, it must be the final span, in which case
+      //       using the natural video duration is acceptable.
+      final end = span.end ?? videoDuration;
+      accumulation += (end - span.start);
+    }
+    return accumulation;
+  }
+
+  @override
+  DiagnosticsNode createDiagnosticsNode() {
+    return DiagnosticsNode(
+      name: 'VideoClipComposition',
+      properties: [
+        PropertyNode(name: 'video path: $_videoPath'),
+        for (final span in _spans!) PropertyNode(name: span.toString()),
+      ],
+    );
+  }
+
+  @override
+  Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
+    // TODO: trim clip to match settings.duration
+
+    final assetStream = builder.addAsset(_videoPath!);
+    final outStreams = <FfmpegStream>[];
+
+    final hasVideo = await this.hasVideo();
+    final hasAudio = await this.hasAudio();
+    for (int i = 0; i < _spans!.length; ++i) {
+      final span = _spans![i];
+      final outStream = builder.createStream(
+        hasVideo: hasVideo,
+        hasAudio: hasAudio,
+      );
+      outStreams.add(outStream);
+
+      if (hasVideo) {
+        final resizeFilters = await _createResizeFiltersIfNeeded(settings);
+
+        builder.addFilterChain(
+          FilterChain(
+            inputs: [assetStream.videoOnly],
+            filters: [
+              if (resizeFilters.isNotEmpty) ...resizeFilters,
+              TrimFilter(
+                start: span.start,
+                end: span.end,
+              ),
+              const SetPtsFilter.startPts(),
+            ],
+            outputs: [outStream.videoOnly],
+          ),
+        );
+      }
+
+      if (hasAudio) {
+        builder.addFilterChain(
+          FilterChain(
+            inputs: [assetStream.audioOnly],
+            filters: [
+              ATrimFilter(
+                start: span.start,
+                end: span.end,
+              ),
+              const ASetPtsFilter.startPts(),
+            ],
+            outputs: [outStream.audioOnly],
+          ),
+        );
+      }
+    }
+
+    if (_spans!.length > 1) {
+      final concatOutStream = builder.createStream();
+      builder.addFilterChain(
+        FilterChain(
+          inputs: outStreams.fold(
+            <FfmpegStream>[],
+            (inputs, outStream) => List.from([...inputs, outStream]),
+          ),
+          filters: [
+            ConcatFilter(
+              segmentCount: outStreams.length,
+              outputVideoStreamCount: 1,
+              outputAudioStreamCount: 1,
+            )
+          ],
+          outputs: [concatOutStream],
+        ),
+      );
+
+      return concatOutStream;
+    } else {
+      return outStreams.last;
+    }
+  }
+
+  Future<List<Filter>> _createResizeFiltersIfNeeded(CompositionSettings settings) async {
+    final contentDimensions = settings.videoDimensions;
+    final videoInfo = await Ffprobe.run(_videoPath!);
+    final videoStream = videoInfo.streams!.firstWhereOrNull((element) => element.codecType == 'video');
+    if (videoStream == null) {
+      throw Exception("Couldn't find video stream for VideoClipComposition.");
+    }
+
+    if (videoStream.width != contentDimensions.width || videoStream.height != contentDimensions.height) {
+      print(
+          'WARNING: Video source "$_videoPath" has incompatible dimensions (${videoStream.width}x${videoStream.height}). Resizing and cropping to ${contentDimensions.width}x${contentDimensions.height}');
+
+      final finalSize = settings.videoDimensions;
+      final scaleFilter = (finalSize.width / finalSize.height) > (contentDimensions.width / contentDimensions.height)
+          ? ScaleFilter(
+              width: finalSize.width as int?,
+              height: -1,
+            )
+          : ScaleFilter(
+              width: -1,
+              height: finalSize.height as int?,
+            );
+      final cropFilter = CropFilter(width: finalSize.width as int, height: finalSize.height as int);
+      final setSarFilter = SetSarFilter(sar: '1/1');
+
+      return [
+        scaleFilter,
+        cropFilter,
+        setSarFilter,
+      ];
+    }
+    return [];
+  }
+}
