@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cinema/cutting_room.dart';
+import 'package:cutting_room/cutting_room.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 
 void main() async {

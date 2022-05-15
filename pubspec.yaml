@@ -10,7 +10,6 @@ dependencies:
   ffmpeg_cli:
     git:
       url: https://github.com/Flutter-Bounty-Hunters/ffmpeg_cli.git
-      path: ../ffmpeg_cli
   logging: ^1.0.2
 
 dev_dependencies:
