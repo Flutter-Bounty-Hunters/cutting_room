@@ -7,44 +7,51 @@ import 'package:cutting_room/cutting_room.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 
 void main() async {
-  // Compose the desired video.
-  final comp = SeriesComposition(compositions: [
-    FullVideoComposition(
-      videoPath: "assets/Butterfly-209.mp4",
+  // Compose the desired video and build an FFMPEG command
+  // to render it.
+  final cliCommand = await CompositionBuilder().build(
+    // This is your declarative video composition, much like
+    // a widget tree in Flutter.
+    SeriesComposition(
+      compositions: [
+        FullVideoComposition(
+          videoPath: "assets/Butterfly-209.mp4",
+        ),
+        FullVideoComposition(
+          videoPath: "assets/bee.mp4",
+        ),
+      ],
     ),
-    FullVideoComposition(
-      videoPath: "assets/bee.mp4",
-    ),
-  ]);
+  );
 
-  // Construct the FFMPEG filter graph from the composition tree.
+  // // Construct the FFMPEG filter graph from the composition tree.
+  // //
+  // // The filter graph will become a bunch of complicated arguments
+  // // that are given to FFMPEG in the CLI command.
+  // final builder = FfmpegBuilder();
+  // final outputStream = await comp.build(
+  //   builder,
+  //   CompositionSettings(
+  //     videoDimensions: const Size(1920, 1080),
+  //     duration: await comp.computeIntrinsicDuration(),
+  //   ),
+  // );
   //
-  // The filter graph will become a bunch of complicated arguments
-  // that are given to FFMPEG in the CLI command.
-  final builder = FfmpegBuilder();
-  final outputStream = await comp.build(
-    builder,
-    CompositionSettings(
-      videoDimensions: const Size(1920, 1080),
-      duration: await comp.computeIntrinsicDuration(),
-    ),
-  );
-
-  // Create the FFMPEG command so we can run it.
-  final cliCommand = builder.build(
-    args: [
-      // Set the FFMPEG log level.
-      CliArg.logLevel(LogLevel.info),
-      // Our composition has video and audio. Map those streams to
-      // FFMPEG's output.
-      CliArg(name: 'map', value: outputStream.videoId!),
-      CliArg(name: 'map', value: outputStream.audioId!),
-      // TODO: need to generalize knowledge of when to use vsync -2
-      const CliArg(name: 'vsync', value: '2'),
-    ],
-    mainOutStream: outputStream,
-    outputFilepath: "output/test_render.mp4",
-  );
+  // // Create the FFMPEG command so we can run it.
+  // final cliCommand = builder.build(
+  //   args: [
+  //     // Set the FFMPEG log level.
+  //     CliArg.logLevel(LogLevel.info),
+  //     // Our composition has video and audio. Map those streams to
+  //     // FFMPEG's output.
+  //     CliArg(name: 'map', value: outputStream.videoId!),
+  //     CliArg(name: 'map', value: outputStream.audioId!),
+  //     // TODO: need to generalize knowledge of when to use vsync -2
+  //     const CliArg(name: 'vsync', value: '2'),
+  //   ],
+  //   mainOutStream: outputStream,
+  //   outputFilepath: "output/test_render.mp4",
+  // );
 
   print('');
   print('Expected command input: ');
