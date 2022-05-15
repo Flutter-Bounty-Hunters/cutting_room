@@ -6,8 +6,8 @@ import 'compositions.dart';
 ///
 /// The opaque pixels of the [mask] will retain the pixels of the
 /// [content].
-class Mask extends ProxyComposition {
-  Mask({
+class MaskComposition extends ProxyComposition {
+  MaskComposition({
     required Composition content,
     required this.mask,
   }) : super(content: content);
