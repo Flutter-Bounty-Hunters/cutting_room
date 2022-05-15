@@ -36,6 +36,9 @@ class PartialComposition implements Composition {
   }
 
   @override
+  Future<VideoSize> computeIntrinsicSize() => _content.computeIntrinsicSize();
+
+  @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
       name: 'PartialComposition',

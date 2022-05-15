@@ -37,6 +37,11 @@ class LoudnormComposition implements Composition {
   }
 
   @override
+  Future<VideoSize> computeIntrinsicSize() async {
+    return content != null ? await content!.computeIntrinsicSize() : const VideoSize(width: 0, height: 0);
+  }
+
+  @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
       name: 'LoudnormComposition',

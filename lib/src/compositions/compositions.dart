@@ -24,10 +24,27 @@ abstract class Composition {
   /// equivalent to the length of that slice.
   Future<Duration> computeIntrinsicDuration();
 
+  /// Computes the natural, or intrinsic, size of this composition.
+  ///
+  /// A [Composition] may not have an intrinsic size, such as a solid color
+  /// that fills all space. In this case, a [VideoSize] with `0` values should
+  /// be returned.
+  Future<VideoSize> computeIntrinsicSize();
+
   DiagnosticsNode createDiagnosticsNode();
 
   /// Adds this composition to the composition tree in the given [builder].
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings);
+}
+
+/// Base class, for a [Composition] that fills available space, e.g., a solid
+/// color fill.
+abstract class VirtualComposition implements Composition {
+  @override
+  Future<Duration> computeIntrinsicDuration() async => Duration.zero;
+
+  @override
+  Future<VideoSize> computeIntrinsicSize() async => const VideoSize(width: 0, height: 0);
 }
 
 /// Composition configuration.
@@ -95,6 +112,11 @@ abstract class ProxyComposition implements Composition {
   @override
   Future<Duration> computeIntrinsicDuration() async {
     return await content.computeIntrinsicDuration();
+  }
+
+  @override
+  Future<VideoSize> computeIntrinsicSize() async {
+    return await content.computeIntrinsicSize();
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:cutting_room/src/move_to_ffmpeg_cli.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 
 import 'compositions.dart';
@@ -36,6 +37,12 @@ class FullVideoComposition implements Composition {
   Future<Duration> computeIntrinsicDuration() async {
     final videoDetails = await Ffprobe.run(_videoPath);
     return videoDetails.format!.duration!;
+  }
+
+  @override
+  Future<VideoSize> computeIntrinsicSize() async {
+    final videoSize = await probeVideoSize(_videoPath);
+    return videoSize ?? const VideoSize(width: 0, height: 0);
   }
 
   @override

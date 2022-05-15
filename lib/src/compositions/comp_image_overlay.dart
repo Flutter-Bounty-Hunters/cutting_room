@@ -24,6 +24,10 @@ class ImageComposition implements Composition {
     return Duration.zero;
   }
 
+  // TODO: Check the actual size of the image
+  @override
+  Future<VideoSize> computeIntrinsicSize() async => const VideoSize(width: 0, height: 0);
+
   @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
@@ -57,14 +61,13 @@ class ImageComposition implements Composition {
   }
 }
 
-class ImageOverlayComposition implements Composition {
+class ImageOverlayComposition extends ProxyComposition {
   ImageOverlayComposition({
     required Composition content,
     required String imageFilePath,
-  })  : _content = content,
-        _imageFilePath = imageFilePath;
+  })  : _imageFilePath = imageFilePath,
+        super(content: content);
 
-  final Composition _content;
   final String _imageFilePath;
 
   @override
@@ -78,11 +81,6 @@ class ImageOverlayComposition implements Composition {
   }
 
   @override
-  Future<Duration> computeIntrinsicDuration() {
-    return _content.computeIntrinsicDuration();
-  }
-
-  @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
       name: 'ImageOverlayComposition',
@@ -90,14 +88,14 @@ class ImageOverlayComposition implements Composition {
         PropertyNode(name: 'image file path: $_imageFilePath'),
       ],
       children: [
-        _content.createDiagnosticsNode(),
+        content.createDiagnosticsNode(),
       ],
     );
   }
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    final contentStream = await _content.build(builder, settings);
+    final contentStream = await content.build(builder, settings);
     final overlayImageStream = builder.addAsset(_imageFilePath, hasAudio: false);
     final outStream = builder.createStream();
 

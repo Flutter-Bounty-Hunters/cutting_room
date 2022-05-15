@@ -1,3 +1,4 @@
+import 'package:cutting_room/src/move_to_ffmpeg_cli.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 import 'comp_transparent.dart';
 import 'compositions.dart';
@@ -62,6 +63,20 @@ class LayeredComposition implements Composition {
   }
 
   @override
+  Future<VideoSize> computeIntrinsicSize() async {
+    VideoSize largestSize = const VideoSize(width: 0, height: 0);
+
+    for (final layer in layers) {
+      for (final span in layer.spans) {
+        final spanVideoSize = await span.composition.computeIntrinsicSize();
+        largestSize = largestSize.expandTo(spanVideoSize);
+      }
+    }
+
+    return largestSize;
+  }
+
+  @override
   DiagnosticsNode createDiagnosticsNode() {
     final children = <DiagnosticsNode>[];
     for (final layer in layers) {
@@ -80,6 +95,10 @@ class LayeredComposition implements Composition {
       throw Exception('LayerComposition needs to have at least 1 layer to build()');
     }
 
+    print("Building LayersComposition");
+    print(" - Layer count: ${layers.length}");
+    print(" - Longest layer: ${(await computeIntrinsicDuration())}");
+
     if (layers.length == 1) {
       // There is only 1 layer. No need to use overlays. Return the layer's
       // FFMPEG stream, directly.
@@ -87,11 +106,11 @@ class LayeredComposition implements Composition {
     }
 
     // Stack the layers in overlay filters
-    final audioStreams = <FfmpegStream>[];
+    final audioStreamIds = <FfmpegStream>[];
 
     FfmpegStream previousLayerStream = await layers.first.build(builder, settings);
     if (await layers.first.hasAudio()) {
-      audioStreams.add(previousLayerStream.audioOnly);
+      audioStreamIds.add(previousLayerStream.audioOnly);
     }
 
     for (int i = 1; i < layers.length; ++i) {
@@ -144,7 +163,7 @@ class LayeredComposition implements Composition {
       final newLayerStream = await layers[i].build(builder, settings);
       final newLayerHasAudio = await layers[i].hasAudio();
       if (newLayerHasAudio) {
-        audioStreams.add(newLayerStream.audioOnly);
+        audioStreamIds.add(newLayerStream.audioOnly);
       }
 
       final newCompStream = builder.createStream(
@@ -153,7 +172,7 @@ class LayeredComposition implements Composition {
         // the final one are just video overlay streams. The final stream
         // is the output for this entire composition and it needs to mix
         // all the audio, if there is any.
-        hasAudio: i == layers.length - 1 ? audioStreams.isNotEmpty : false,
+        hasAudio: i == layers.length - 1 ? audioStreamIds.isNotEmpty : false,
       );
 
       if (await layers[i].hasVideo()) {
@@ -169,21 +188,21 @@ class LayeredComposition implements Composition {
       previousLayerStream = newCompStream;
     }
 
-    if (audioStreams.length >= 2) {
+    if (audioStreamIds.length >= 2) {
       builder.addFilterChain(
         FilterChain(
-          inputs: audioStreams,
+          inputs: audioStreamIds,
           filters: [
-            AMixFilter(inputCount: audioStreams.length),
-            VolumeFilter(volume: 1.0 * audioStreams.length),
+            AMixFilter(inputCount: audioStreamIds.length),
+            VolumeFilter(volume: 1.0 * audioStreamIds.length),
           ],
           outputs: [previousLayerStream.audioOnly],
         ),
       );
-    } else if (audioStreams.length == 1) {
+    } else if (audioStreamIds.length == 1) {
       builder.addFilterChain(
         FilterChain(
-          inputs: [audioStreams.first],
+          inputs: [audioStreamIds.first],
           filters: [
             const ACopyFilter(),
           ],
@@ -266,6 +285,13 @@ class Layer {
 
     spans.sort((span1, span2) => span1.start.inMilliseconds - span2.start.inMilliseconds);
 
+    print("Building a layer");
+    print("Composition settings duration: ${settings.duration}");
+    print("Spans:");
+    for (final span in spans) {
+      print(" - ${span.start} -> ${span.end}, end time: ${await span.computeEndTime()}comp: ${span.composition}");
+    }
+
     // Ensure that no spans overlap.
     for (int i = 0; i < spans.length - 1; ++i) {
       if (await spans[i].computeEndTime() > await spans[i + 1].computeEndTime()) {
@@ -328,10 +354,16 @@ class Layer {
           hasAudio: _hasAudio,
           duration: nextCutPoint - await spans[i].computeEndTime(),
         );
+        print("Adding blank composition with duration: ${nextCutPoint - await spans[i].computeEndTime()}");
 
+        // TODO: this is the source of the timing issue with the Clone Wars opener
         concatStreams.add(
           await blankComposition.build(
-              builder, settings.copyWith(duration: nextCutPoint - await spans[i].computeEndTime())),
+            builder,
+            settings.copyWith(
+              duration: nextCutPoint - await spans[i].computeEndTime(),
+            ),
+          ),
         );
       }
     }
@@ -339,6 +371,8 @@ class Layer {
     if (concatStreams.length == 1) {
       return concatStreams.first;
     }
+
+    print(" - layer includes ${concatStreams.length} pieces");
 
     final outStream = builder.createStream();
     builder.addFilterChain(

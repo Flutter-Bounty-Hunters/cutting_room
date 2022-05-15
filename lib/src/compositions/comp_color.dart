@@ -6,7 +6,7 @@ import 'compositions.dart';
 // TODO: figure out how to generate a color composition that plays nice
 //       with video timing. Currently it causes video rendering to go
 //       on forever. That's why white and black use associated PNGs.
-class ColorComposition implements Composition {
+class ColorComposition extends VirtualComposition {
   ColorComposition({
     required FfmpegColor color,
   }) : _color = color;
@@ -68,7 +68,7 @@ class ColorComposition implements Composition {
   }
 }
 
-class ColorBitmapComposition implements Composition {
+class ColorBitmapComposition extends VirtualComposition {
   ColorBitmapComposition.white({
     bool hasAudio = true,
   })  : _bitmapFileName = 'white.png',

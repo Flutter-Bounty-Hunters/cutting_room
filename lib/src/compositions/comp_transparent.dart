@@ -61,6 +61,9 @@ class TransparentComposition implements Composition {
   }
 
   @override
+  Future<VideoSize> computeIntrinsicSize() async => const VideoSize(width: 0, height: 0);
+
+  @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
       name: 'TransparentComposition',
@@ -85,7 +88,7 @@ class TransparentComposition implements Composition {
         filters: [
           SetSarFilter(sar: '1/1'),
           TPadFilter(
-            stopDuration: settings.duration,
+            stopDuration: _duration,
             stopMode: 'clone',
           ),
         ],

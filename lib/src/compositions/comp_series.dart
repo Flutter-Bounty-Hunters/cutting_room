@@ -55,6 +55,15 @@ class SeriesComposition implements Composition {
   }
 
   @override
+  Future<VideoSize> computeIntrinsicSize() async {
+    // Assume that all compositions in the series are the same
+    // size. Return the size of the first one.
+    return _compositions.isNotEmpty
+        ? await _compositions.first!.computeIntrinsicSize()
+        : const VideoSize(width: 0, height: 0);
+  }
+
+  @override
   DiagnosticsNode createDiagnosticsNode() {
     return DiagnosticsNode(
       name: 'SeriesComposition',
