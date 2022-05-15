@@ -7,9 +7,7 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  ffmpeg_cli:
-    git:
-      url: https://github.com/Flutter-Bounty-Hunters/ffmpeg_cli.git
+  ffmpeg_cli: 0.1.0
   logging: ^1.0.2
 
 dev_dependencies:

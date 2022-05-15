@@ -10,9 +10,7 @@ environment:
 dependencies:
   cutting_room:
     path: ../
-  ffmpeg_cli:
-    git:
-      url: https://github.com/Flutter-Bounty-Hunters/ffmpeg_cli.git
+  ffmpeg_cli: 0.1.0
 
 dev_dependencies:
   test: ^1.17.12
