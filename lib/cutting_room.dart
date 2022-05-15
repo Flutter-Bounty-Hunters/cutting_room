@@ -1,9 +1,11 @@
 export 'src/compositions/comp_color.dart';
+export 'src/compositions/comp_composed.dart';
 export 'src/compositions/comp_fade.dart';
 export 'src/compositions/comp_full_video.dart';
 export 'src/compositions/comp_image_overlay.dart';
 export 'src/compositions/comp_layered.dart';
 export 'src/compositions/comp_loudnorm.dart';
+export 'src/compositions/comp_mask.dart';
 export 'src/compositions/comp_partial.dart';
 export 'src/compositions/comp_resize.dart';
 export 'src/compositions/comp_series.dart';
