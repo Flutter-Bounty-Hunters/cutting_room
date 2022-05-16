@@ -155,10 +155,7 @@ class VideoClipComposition implements Composition {
       final concatOutStream = builder.createStream();
       builder.addFilterChain(
         FilterChain(
-          inputs: outStreams.fold(
-            <FfmpegStream>[],
-            (inputs, outStream) => List.from([...inputs, outStream.videoId, outStream.audioId]),
-          ),
+          inputs: outStreams,
           filters: [
             ConcatFilter(
               segmentCount: outStreams.length,
