@@ -62,7 +62,6 @@ class LoudnormComposition implements Composition {
       throw Exception('Tried to build a LoudnormComposition with content that doesn\'t have audio.');
     }
 
-    print('Building loudnorm composition');
     final contentStream = await content!.build(builder, settings);
     final outputStream = builder.createStream(hasVideo: await hasVideo(), hasAudio: true);
 

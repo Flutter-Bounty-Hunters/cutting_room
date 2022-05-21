@@ -80,7 +80,6 @@ class VideoClipComposition implements Composition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    print("Building VideoClipComposition: $_videoPath");
     // TODO: trim clip to match settings.duration
 
     final assetStream = builder.addAsset(_videoPath!);
@@ -101,12 +100,6 @@ class VideoClipComposition implements Composition {
       Duration? endTime = span.end;
       endTime ??= await computeIntrinsicDuration() + span.start;
       endTime = (endTime - span.start) <= remainingTime ? endTime : (span.start + remainingTime);
-      print("Building segment $i, selecting clip end time:");
-      print(" - accumulated time: $accumulatedTime");
-      print(" - remaining time: $remainingTime");
-      print(" - start time: ${span.start}");
-      print(" - scheduled end time: ${span.end}");
-      print(" - chosen end time: $endTime");
 
       final outStream = builder.createStream(
         hasVideo: hasVideo,
@@ -117,7 +110,6 @@ class VideoClipComposition implements Composition {
       if (hasVideo) {
         final resizeFilters = await _createResizeFiltersIfNeeded(settings);
 
-        print(" - adding segment trim filter: ${span.start} -> $endTime");
         builder.addFilterChain(
           FilterChain(
             inputs: [assetStream.videoOnly],

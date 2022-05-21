@@ -40,8 +40,6 @@ class ColorComposition extends VirtualComposition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    print('ColorComposition duration: ${settings.duration}');
-
     final colorStream = builder.addVideoVirtualDevice(
       "color=color=${_color.toCli()}:size=${settings.videoDimensions.width}x${settings.videoDimensions.height}:rate=30:duration='${settings.duration.inMilliseconds / 1000}'",
     );
@@ -79,10 +77,6 @@ class ColorBitmapComposition extends VirtualComposition {
   })  : _bitmapFileName = 'black.png',
         _hasAudio = hasAudio;
 
-  ColorBitmapComposition._({required String bitmapPath, bool hasAudio = true})
-      : _bitmapFileName = bitmapPath,
-        _hasAudio = hasAudio;
-
   final bool _hasAudio;
   final String _bitmapFileName;
 
@@ -113,7 +107,6 @@ class ColorBitmapComposition extends VirtualComposition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    print('Building ColorComposition with bitmap: $_bitmapFileName');
     final compStream = builder.createStream(hasVideo: true, hasAudio: _hasAudio);
 
     final absoluteBitmapPath = Assets.instance.getAssetPath(_bitmapFileName);

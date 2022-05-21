@@ -5,6 +5,7 @@ Future<VideoSize?> probeVideoSize(String videoPath) async {
   if (videoDetails.streams == null || videoDetails.streams!.isEmpty) {
     // No stream data. Even audio files should have streams, so this
     // seems strange.
+    // ignore: avoid_print
     print("WARNING: Tried to compute intrinsic size for a file that has no streams: $videoPath");
     return null;
   }
@@ -18,11 +19,13 @@ Future<VideoSize?> probeVideoSize(String videoPath) async {
   }
   if (videoStream == null) {
     // Couldn't find a video stream. Maybe this is an audio file?
+    // ignore: avoid_print
     print("WARNING: Tried to compute intrinsic size for a file that has no video stream: $videoPath");
     return null;
   }
 
   if (videoStream.width == null || videoStream.height == null) {
+    // ignore: avoid_print
     print(
         "WARNING: Tried to compute intrinsic size for a video, but its width and/or height are missing: width - ${videoStream.width}, height - ${videoStream.height}");
     return null;

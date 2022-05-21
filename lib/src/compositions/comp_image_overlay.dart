@@ -40,7 +40,6 @@ class ImageComposition implements Composition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    print('Image comp. build() - duration: ${settings.duration}');
     final assetStream = builder.addAsset(imagePath!, hasAudio: false);
     final outStream = builder.createStream(hasAudio: false);
 

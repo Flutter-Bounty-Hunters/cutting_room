@@ -95,10 +95,6 @@ class LayeredComposition implements Composition {
       throw Exception('LayerComposition needs to have at least 1 layer to build()');
     }
 
-    print("Building LayersComposition");
-    print(" - Layer count: ${layers.length}");
-    print(" - Longest layer: ${(await computeIntrinsicDuration())}");
-
     if (layers.length == 1) {
       // There is only 1 layer. No need to use overlays. Return the layer's
       // FFMPEG stream, directly.
@@ -285,13 +281,6 @@ class Layer {
 
     spans.sort((span1, span2) => span1.start.inMilliseconds - span2.start.inMilliseconds);
 
-    print("Building a layer");
-    print("Composition settings duration: ${settings.duration}");
-    print("Spans:");
-    for (final span in spans) {
-      print(" - ${span.start} -> ${span.end}, end time: ${await span.computeEndTime()}comp: ${span.composition}");
-    }
-
     // Ensure that no spans overlap.
     for (int i = 0; i < spans.length - 1; ++i) {
       if (await spans[i].computeEndTime() > await spans[i + 1].computeEndTime()) {
@@ -354,7 +343,6 @@ class Layer {
           hasAudio: _hasAudio,
           duration: nextCutPoint - await spans[i].computeEndTime(),
         );
-        print("Adding blank composition with duration: ${nextCutPoint - await spans[i].computeEndTime()}");
 
         // TODO: this is the source of the timing issue with the Clone Wars opener
         concatStreams.add(
@@ -371,8 +359,6 @@ class Layer {
     if (concatStreams.length == 1) {
       return concatStreams.first;
     }
-
-    print(" - layer includes ${concatStreams.length} pieces");
 
     final outStream = builder.createStream();
     builder.addFilterChain(
