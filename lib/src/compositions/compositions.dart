@@ -123,6 +123,18 @@ abstract class ProxyComposition implements Composition {
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings);
 }
 
+/// [DiagnosticsNode] is a concept taking from Flutter that helps to aggregate
+/// the configuration of a composition tree, and interrogate it.
+///
+/// A specific composition will produce a [DiagnosticsNode] upon request. That
+/// composition will give its node a [name], and a set of property values that
+/// are associated with that composition, such as the image file that's used
+/// within an image overlay composition. Additionally, if a composition has
+/// child compositions, the [DiagnosticsNode]s for each of those children are
+/// available, too.
+///
+/// To inspect a diagnostic tree, use [printDeep] to print the tree to the
+/// console.
 class DiagnosticsNode {
   DiagnosticsNode({
     required this.name,
@@ -153,6 +165,11 @@ class DiagnosticsNode {
   }
 }
 
+/// A [DiagnosticsNode] that represents a single property (name/value pair) that's
+/// associated with a composition.
+///
+/// For example, an image overlay composition might define a [PropertyNode] with a
+/// name of "imageFile" and a value of "/path/to/my_overlay.png".
 class PropertyNode extends DiagnosticsNode {
   PropertyNode({
     String name = '',
