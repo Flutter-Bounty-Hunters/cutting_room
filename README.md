@@ -63,3 +63,15 @@ await process.exitCode;
 If the `Composition`s that ship with `cutting_room` don't fit your needs, you can always define your own. To
 implement a custom `Composition`, you need to understand how FFMPEG commands are defined, and then assemble
 FFMPEG filters that accomplish your goal.
+
+# Cutting Room Assets
+Internally, `cutting_room` includes and uses a few assets. For example, `cutting_room` uses a PNG
+image filled with black to render black compositions. There are various reasons why these assets
+are used. In the future, `cutting_room` might find a way to get rid of them.
+
+The important part is that these assets are files. These files are included with `cutting_room`,
+and you shouldn't notice them when you're running your app with the `dart` tool. However, if you
+compile your Dart app to a binary executable, you lose access to dependency assets, including
+those in `cutting_room`. In this case, `cutting_room` will write these assets to new files on your
+local file system when you run your app. For this reason, you shouldn't be surprised if some
+generated image and video files appear wherever you run your video rendering.
