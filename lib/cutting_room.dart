@@ -14,4 +14,5 @@ export 'src/compositions/comp_video_clip.dart';
 export 'src/compositions/compositions.dart';
 export 'src/assets.dart';
 export 'src/builder.dart';
+export 'src/logging.dart';
 export 'src/timing.dart';
