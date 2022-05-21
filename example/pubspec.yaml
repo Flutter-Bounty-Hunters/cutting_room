@@ -11,6 +11,7 @@ dependencies:
   cutting_room:
     path: ../
   ffmpeg_cli: 0.1.0
+  logging: ^1.0.2
 
 dev_dependencies:
   test: ^1.17.12

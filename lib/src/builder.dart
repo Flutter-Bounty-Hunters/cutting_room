@@ -14,12 +14,16 @@ class CompositionBuilder {
   // TODO: add FFMPEG vsync property
 
   /// Builds an [FfmpegCommand] that renders the given [composition].
-  Future<FfmpegCommand> build(Composition composition) async {
+  Future<FfmpegCommand> build(
+    Composition composition, {
+    required Size size,
+    required String outputPath,
+  }) async {
     final ffmpegBuilder = FfmpegBuilder();
     final outputStream = await composition.build(
       ffmpegBuilder,
       CompositionSettings(
-        videoDimensions: const Size(1920, 1080),
+        videoDimensions: size,
         duration: await composition.computeIntrinsicDuration(),
       ),
     );
@@ -33,7 +37,7 @@ class CompositionBuilder {
         const CliArg(name: 'vsync', value: '2'),
       ],
       mainOutStream: outputStream,
-      outputFilepath: "output/test_render.mp4",
+      outputFilepath: outputPath,
     );
   }
 }

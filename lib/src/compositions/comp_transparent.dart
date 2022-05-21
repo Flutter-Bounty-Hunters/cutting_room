@@ -36,7 +36,8 @@ class TransparentComposition implements Composition {
       : assert(
             duration >= const Duration(seconds: 1),
             'Can\'t render less than 1 second of silence because '
-            'TransparentComposition uses a 1-second silent video at the beginning of its stream'),
+            'TransparentComposition uses a 1-second silent video at the beginning of its stream.'
+            'You requested a duration of $duration'),
         _hasVideo = hasVideo,
         _hasAudio = hasAudio,
         _duration = duration;
@@ -86,6 +87,12 @@ class TransparentComposition implements Composition {
       builder.addFilterChain(FilterChain(
         inputs: [emptyVideoStream.videoOnly],
         filters: [
+          // The transparent MOV is 1920x1080. Scale down, if needed.
+          if (settings.videoDimensions != const Size(1920, 1080)) //
+            ScaleFilter(
+              width: settings.videoDimensions.width.toInt(),
+              height: settings.videoDimensions.height.toInt(),
+            ),
           SetSarFilter(sar: '1/1'),
           TPadFilter(
             stopDuration: _duration,

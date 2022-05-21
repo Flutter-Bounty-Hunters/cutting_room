@@ -115,6 +115,12 @@ class ColorBitmapComposition extends VirtualComposition {
     builder.addFilterChain(FilterChain(
       inputs: [colorVideoStream.videoOnly],
       filters: [
+        // The bitmap is 1920x1080. Scale down, if needed.
+        if (settings.videoDimensions != const Size(1920, 1080)) //
+          ScaleFilter(
+            width: settings.videoDimensions.width.toInt(),
+            height: settings.videoDimensions.height.toInt(),
+          ),
         SetSarFilter(sar: '1/1'),
         TPadFilter(
           stopDuration: settings.duration,
