@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cutting_room/src/assets.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 
@@ -36,7 +38,8 @@ class TransparentComposition implements Composition {
       : assert(
             duration >= const Duration(seconds: 1),
             'Can\'t render less than 1 second of silence because '
-            'TransparentComposition uses a 1-second silent video at the beginning of its stream'),
+            'TransparentComposition uses a 1-second silent video at the beginning of its stream.'
+            'You requested a duration of $duration'),
         _hasVideo = hasVideo,
         _hasAudio = hasAudio,
         _duration = duration;
@@ -80,12 +83,18 @@ class TransparentComposition implements Composition {
     final compStream = builder.createStream(hasVideo: _hasVideo, hasAudio: _hasAudio);
 
     if (_hasVideo) {
-      final absoluteBitmapPath = Assets.instance.getAssetPath('empty.png');
+      final absoluteBitmapPath = Assets.invisiblePng.findOrInflate(Directory("./generated_assets"));
 
       final emptyVideoStream = builder.addAsset(absoluteBitmapPath, hasAudio: false);
       builder.addFilterChain(FilterChain(
         inputs: [emptyVideoStream.videoOnly],
         filters: [
+          // The transparent MOV is 1920x1080. Scale down, if needed.
+          if (settings.videoDimensions != const Size(1920, 1080)) //
+            ScaleFilter(
+              width: settings.videoDimensions.width.toInt(),
+              height: settings.videoDimensions.height.toInt(),
+            ),
           SetSarFilter(sar: '1/1'),
           TPadFilter(
             stopDuration: _duration,
@@ -97,7 +106,7 @@ class TransparentComposition implements Composition {
     }
 
     if (_hasAudio) {
-      final emptyVideoAbsolutePath = Assets.instance.getAssetPath('invisible.mov');
+      final emptyVideoAbsolutePath = Assets.invisibleVideo.findOrInflate(Directory("./generated_assets"));
       final emptyVideoStream = builder.addAsset(emptyVideoAbsolutePath, hasAudio: true);
 
       final nullAudioStream = builder.addNullAudio();
