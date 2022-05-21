@@ -8,16 +8,13 @@ import 'compositions.dart';
 class FullVideoComposition implements Composition {
   FullVideoComposition({
     required String videoPath,
-    bool hasTransparency = false,
     Duration? audioFadeInDuration,
     Duration? audioFadeOutDuration,
   })  : _videoPath = videoPath,
-        _hasTransparency = hasTransparency,
         _audioFadeInDuration = audioFadeInDuration,
         _audioFadeOutDuration = audioFadeOutDuration;
 
   final String _videoPath;
-  final bool _hasTransparency;
   final Duration? _audioFadeInDuration;
   final Duration? _audioFadeOutDuration;
 
@@ -59,7 +56,6 @@ class FullVideoComposition implements Composition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    print('Building FullVideoComposition');
     // TODO: trim to limit duration to given settings.duration.
 
     final hasVideo = await this.hasVideo();
@@ -122,7 +118,6 @@ class FullVideoComposition implements Composition {
 
       return fadedStream;
     } else {
-      print('Full video does not need editing. Returning the asset.');
       return assetStream;
     }
   }

@@ -140,6 +140,7 @@ class DiagnosticsNode {
   List<DiagnosticsNode> getChildren() => _children;
 
   void printDeep([String indent = '']) {
+    // ignore: avoid_print
     print('$indent$name');
 
     for (final prop in getProperties()) {
@@ -154,11 +155,10 @@ class DiagnosticsNode {
 
 class PropertyNode extends DiagnosticsNode {
   PropertyNode({
-    this.name = '',
+    String name = '',
     this.value = '',
   }) : super(name: name);
 
-  final String name;
   final String value;
 
   @override
@@ -166,6 +166,7 @@ class PropertyNode extends DiagnosticsNode {
 
   @override
   void printDeep([String indent = '']) {
+    // ignore: avoid_print
     print('$indent$name: $value');
   }
 }
