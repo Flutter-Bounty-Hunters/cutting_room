@@ -15,7 +15,7 @@ In Cutting Room, what you're trying to do is compose a composition that will be 
 When everything is said and done, a massive FFMPEG command will run at the command line and produce
 your video.
 
-Cutting Room gives you declarative compositions so that you can compose a video, kind of like you would
+Cutting Room gives you declarative compositions so that you can compose a video, kind of like how you
 compose a Flutter widget tree. In the following example, a video is composed from two other video clips,
 played back to back (in series).
 
