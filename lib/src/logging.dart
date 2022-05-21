@@ -1,8 +1,9 @@
 import 'package:logging/logging.dart';
 
-class CuttingRoomLogs {
-  static final compositionLog = Logger("compositions");
+final compositionLog = Logger("compositions");
+final assetsLog = Logger("assets");
 
+class CuttingRoomLogs {
   static CuttingRoomLogs? _instance;
   static CuttingRoomLogs get instance {
     _instance ??= CuttingRoomLogs();
