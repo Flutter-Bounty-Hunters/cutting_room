@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cutting_room/src/assets.dart';
 import 'package:ffmpeg_cli/ffmpeg_cli.dart';
 
@@ -81,7 +83,7 @@ class TransparentComposition implements Composition {
     final compStream = builder.createStream(hasVideo: _hasVideo, hasAudio: _hasAudio);
 
     if (_hasVideo) {
-      final absoluteBitmapPath = Assets.instance.getAssetPath('empty.png');
+      final absoluteBitmapPath = Assets.invisiblePng.findOrInflate(Directory("./generated_assets"));
 
       final emptyVideoStream = builder.addAsset(absoluteBitmapPath, hasAudio: false);
       builder.addFilterChain(FilterChain(
@@ -104,7 +106,7 @@ class TransparentComposition implements Composition {
     }
 
     if (_hasAudio) {
-      final emptyVideoAbsolutePath = Assets.instance.getAssetPath('invisible.mov');
+      final emptyVideoAbsolutePath = Assets.invisibleVideo.findOrInflate(Directory("./generated_assets"));
       final emptyVideoStream = builder.addAsset(emptyVideoAbsolutePath, hasAudio: true);
 
       final nullAudioStream = builder.addNullAudio();
