@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
+  collection: ^1.16.0
   ffmpeg_cli: ^0.1.0
   logging: ^1.0.2
 
