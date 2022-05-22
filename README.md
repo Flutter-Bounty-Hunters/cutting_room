@@ -10,6 +10,17 @@
 # In the wild
 `cutting_room` is used to render all videos on the [Flutter Bounty Hunters Channel](https://www.youtube.com/channel/UCLcjoIESotPI-5VD-85k-jA) as well as the [SuperDeclarative! Channel](https://youtube.com/c/SuperDeclarative).
 
+# Run the examples
+To run the examples, you'll need to pull the example video assets from Git Large File System (LFS). Those assets are stored using Git LFS because pub.dev won't upload packages beyond a certain size.
+
+First, [install Git LFS locally](https://git-lfs.github.com/).
+
+Once Git LFS is setup, use the following command from the root directory of this repository to download the video assets.
+
+```bash
+git lfs pull
+```
+
 # Quickstart
 In Cutting Room, what you're trying to do is compose a composition that will be rendered using FFMPEG.
 When everything is said and done, a massive FFMPEG command will run at the command line and produce
