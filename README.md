@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/7259036/161407422-074272c2-2935-4eb4-94bc-dceda336c109.png" width="300" alt="Cutting Room"><br>
+  <img src="https://user-images.githubusercontent.com/7259036/170845417-b09072ae-929a-4a85-bb97-cc3ebd7ce15d.png" width="300" alt="Cutting Room"><br>
   <span><b>Compose and render videos with compositions, backed by FFMPEG.</b></span><br><br>
 </p>
 
