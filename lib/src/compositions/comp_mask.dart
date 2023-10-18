@@ -16,7 +16,7 @@ class MaskComposition extends ProxyComposition {
 
   @override
   Future<FfmpegStream> build(FfmpegBuilder builder, CompositionSettings settings) async {
-    final alphaMergeFilter = RawFilter("alphamerge");
+    final alphaMergeFilter = CustomFilter("alphamerge");
 
     final contentStream = await content.build(builder, settings);
     final maskStream = await mask.build(builder, settings);

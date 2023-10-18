@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   collection: ^1.16.0
-  ffmpeg_cli: ^0.1.0
+  ffmpeg_cli: ^0.2.0
   logging: ^1.0.2
 
 dev_dependencies:

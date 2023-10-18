@@ -80,7 +80,7 @@ class PartialComposition implements Composition {
         inputs: [contentStream.audioOnly],
         filters: [
           ADelayFilter(
-            delay: _start,
+            delays: [_start],
           ),
         ],
         outputs: [outStream.audioOnly],
