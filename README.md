@@ -1,9 +1,13 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/7259036/170845417-b09072ae-929a-4a85-bb97-cc3ebd7ce15d.png" width="300" alt="Cutting Room"><br>
-  <span><b>Compose and render videos with compositions, backed by FFMPEG.</b></span><br><br>
+  <img src="https://github.com/Flutter-Bounty-Hunters/cutting_room/assets/7259036/08ebbd10-3866-4f6f-8ad4-14ca4b969563" alt="Cutting Room - Compose and render videos with compositions, backed by FFMPEG">
 </p>
 
-> This project is a Flutter Bounty Hunters [proof-of-concept](http://policies.flutterbountyhunters.com/proof-of-concept). Want more composition types and video controls? [Fund a milestone](http://policies.flutterbountyhunters.com/fund-milestone) today!
+<p align="center">
+  <a href="https://flutterbountyhunters.com" target="_blank">
+    <img src="https://github.com/Flutter-Bounty-Hunters/flutter_test_robots/assets/7259036/1b19720d-3dad-4ade-ac76-74313b67a898" alt="Built by the Flutter Bounty Hunters">
+  </a>
+</p>
+
 
 ---
 
